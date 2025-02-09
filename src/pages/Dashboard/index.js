@@ -1,17 +1,20 @@
-import { Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import React from 'react';
-import { useDispatch } from 'react-redux';
-import { logout } from '../../containers/Authentication/authSlice';
 
 const Dashboard = () => {
-  const dispatch = useDispatch();
-  const handleLogout = () => {
-    dispatch(logout());
-  };
   return (
     <>
-      <Typography>This is the dashboard</Typography>
-      <Button onClick={handleLogout}>Logout</Button>
+      <Typography component='h2' fontWeight='bold'>
+        Welcome to Doggo-E-Doggo!
+      </Typography>
+      <Typography component='p'>
+        We are here to help you find your next doggo. And once you find one,
+        you'll find another and another and another. Come find your new best
+        friends!
+      </Typography>
+      <Typography my={4} component='p'>
+        Search for a doggo below
+      </Typography>
     </>
   );
 };
