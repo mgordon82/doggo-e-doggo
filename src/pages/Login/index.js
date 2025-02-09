@@ -8,9 +8,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { isAuthenticated, isLoading, error } = useSelector(
-    (state) => state.auth
-  );
+  const { isAuthenticated, error } = useSelector((state) => state.auth);
 
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');

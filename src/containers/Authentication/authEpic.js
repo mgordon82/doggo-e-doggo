@@ -49,4 +49,6 @@ const logoutEpic = (action$) =>
     })
   );
 
-export default [authEpic, logoutEpic];
+const epics = [authEpic, logoutEpic];
+
+export default epics;
