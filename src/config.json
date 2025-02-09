@@ -1,0 +1,5 @@
+{
+  "api": {
+    "primaryRestGateway": "https://frontend-take-home-service.fetch.com"
+  }
+}
