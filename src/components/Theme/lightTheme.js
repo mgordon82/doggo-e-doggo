@@ -10,7 +10,7 @@ const lightTheme = {
   palette: {
     type: 'light',
     background: {
-      default: '#ffffff',
+      default: '#E8E7E6',
       disabled: '#dedede',
     },
 
