@@ -1,6 +1,7 @@
-import { Box, Container, Typography } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import React from 'react';
 import { Outlet } from 'react-router';
+import Header from './Header';
 
 const Layout = () => {
   return (
@@ -15,11 +16,11 @@ const Layout = () => {
         bgcolor: 'common.white',
       }}
     >
+      <Header />
       <Box sx={{ display: 'flex' }}>
-        <Box>
-          <Typography>This is the Layout</Typography>
+        <Container maxWidth='xl' sx={{ py: 3 }}>
           <Outlet />
-        </Box>
+        </Container>
       </Box>
     </Container>
   );
