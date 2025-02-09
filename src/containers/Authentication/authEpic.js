@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '../../utilities/axios';
 import { ofType } from 'redux-observable';
 import { of } from 'rxjs';
 import { catchError, switchMap, mergeMap } from 'rxjs/operators';
@@ -36,7 +36,7 @@ const logoutEpic = (action$) =>
   action$.pipe(
     ofType('auth/logout'),
     mergeMap(async () => {
-      sessionStorage.setItem('access-token', false);
+      sessionStorage.removeItem('access-token');
       const response = await axios.post(`${primaryRestGateway()}/auth/logout`);
       if (response.data === 'OK') {
         return true;
