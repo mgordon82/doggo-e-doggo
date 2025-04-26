@@ -15,33 +15,31 @@ const Dashboard = () => {
   const dispatch = useDispatch();
   const {
     data: breedsData,
-    hasCompleted: breedsLoaded,
-    isLoading: breedsLoading,
-    error: loadingError,
+    // hasCompleted: breedsLoaded,
+    // isLoading: breedsLoading,
+    // error: loadingError,
   } = useSelector((state) => state.breeds);
 
-  const [selectedBreeds, setSelectedBreeds] = React.useState([]);
-  const [zipCodes, setZipCodes] = React.useState([]);
-  const [minAge, setMinAge] = React.useState('');
-  const [maxAge, setMaxAge] = React.useState('');
+  // const [selectedBreeds, setSelectedBreeds] = React.useState([]);
+  // const [zipCodes, setZipCodes] = React.useState([]);
+  // const [minAge, setMinAge] = React.useState('');
+  // const [maxAge, setMaxAge] = React.useState('');
 
-  const handleBreedSelection = (event, newValue) => {
-    setSelectedBreeds(newValue);
-  };
+  // const handleBreedSelection = (event, newValue) => {
+  //   setSelectedBreeds(newValue);
+  // };
 
-  const handleSearch = () => {
-    const params = {
-      selectedBreeds,
-      zipCodes,
-      minAge,
-      maxAge,
-    };
-    console.log('search criteria', params);
-  };
+  // const handleSearch = () => {
+  //   const params = {
+  //     selectedBreeds,
+  //     zipCodes,
+  //     minAge,
+  //     maxAge,
+  //   };
+  //   console.log('search criteria', params);
+  // };
   React.useEffect(() => {
-    if (!breedsLoading && !loadingError) {
-      dispatch(getBreeds());
-    }
+    dispatch(getBreeds());
   }, []);
 
   return (
@@ -69,7 +67,7 @@ const Dashboard = () => {
             id='dog-breeds'
             options={breedsData}
             getOptionLabel={(option) => option}
-            onChange={handleBreedSelection}
+            // onChange={handleBreedSelection}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -83,7 +81,7 @@ const Dashboard = () => {
             <TextField label='Zip Codes' name='zipCode' fullWidth />
             <TextField label='Minimum Age' name='ageMin' fullWidth />
             <TextField label='Maximum Age' name='ageMax' fullWidth />
-            <Button fullWidth variant='contained' onClick={handleSearch}>
+            <Button fullWidth variant='contained'>
               Search
             </Button>
           </Stack>
