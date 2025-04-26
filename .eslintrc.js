@@ -1,29 +1,29 @@
 module.exports = {
   settings: {
     react: {
-      version: 'detect',
-    },
+      version: 'detect'
+    }
   },
   env: {
     browser: true,
     es2021: true,
-    jest: true,
+    jest: true
   },
-  extends: ['standard', 'plugin:react/recommended'],
+  extends: ['plugin:react/recommended'],
   overrides: [
     {
       env: {
-        node: true,
+        node: true
       },
       files: ['.eslintrc.{js,cjs}'],
       parserOptions: {
-        sourceType: 'script',
-      },
-    },
+        sourceType: 'script'
+      }
+    }
   ],
   parserOptions: {
     ecmaVersion: 'latest',
-    sourceType: 'module',
+    sourceType: 'module'
   },
   plugins: ['react'],
   rules: {
@@ -36,8 +36,8 @@ module.exports = {
       'error',
       2,
       {
-        SwitchCase: 1,
-      },
+        SwitchCase: 1
+      }
     ],
     'no-prototype-builtins': 'off',
     'no-tabs': 0,
@@ -45,6 +45,6 @@ module.exports = {
     semi: [2, 'always'],
     'no-empty': 'warn',
     'no-unused-vars': 'warn',
-    'jsx-quotes': ['error', 'prefer-single'],
-  },
+    'jsx-quotes': ['error', 'prefer-single']
+  }
 };
