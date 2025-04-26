@@ -49,8 +49,8 @@ const Dashboard = () => {
       </Typography>
       <Typography component='p'>
         We are here to help you find your next doggo. And once you find one,
-        you'll find another and another and another. Come find your new best
-        friends!
+        you&apos;ll find another and another and another. Come find your new
+        best friends!
       </Typography>
       <Typography my={4} component='p'>
         Search for a doggo below
