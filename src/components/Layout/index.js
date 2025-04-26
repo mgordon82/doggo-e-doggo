@@ -13,7 +13,7 @@ const Layout = () => {
         flexDirection: 'column',
         height: '100vh',
         overflow: 'hidden',
-        bgcolor: 'common.white',
+        bgcolor: 'common.white'
       }}
     >
       <Header />

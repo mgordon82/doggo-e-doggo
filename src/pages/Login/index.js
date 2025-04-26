@@ -6,7 +6,7 @@ import {
   Paper,
   Stack,
   TextField,
-  Typography,
+  Typography
 } from '@mui/material';
 import { loginRequest } from '../../containers/Authentication/authSlice';
 import { useNavigate } from 'react-router';
@@ -27,7 +27,7 @@ const Login = () => {
     dispatch(
       loginRequest({
         name,
-        email,
+        email
       })
     );
   };
@@ -49,7 +49,7 @@ const Login = () => {
         justifyContent: 'center',
         alignItems: 'center',
         width: 1,
-        height: '100vh',
+        height: '100vh'
       }}
     >
       <Avatar

@@ -7,7 +7,7 @@ import {
   loginSuccess,
   loginFailed,
   logoutSuccess,
-  logoutFailed,
+  logoutFailed
 } from './authSlice';
 
 const authEpic = (action$) =>
@@ -17,7 +17,7 @@ const authEpic = (action$) =>
       const { name, email } = action.payload;
       const response = await axios.post(`${primaryRestGateway()}/auth/login`, {
         name,
-        email,
+        email
       });
       if (response.data === 'OK') {
         sessionStorage.setItem('access-token', true);

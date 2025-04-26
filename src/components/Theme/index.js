@@ -26,7 +26,7 @@ const Theme = ({ children, theme }) => (
 
 Theme.propTypes = {
   children: PropTypes.element,
-  theme: PropTypes.string,
+  theme: PropTypes.string
 };
 
 export default Theme;

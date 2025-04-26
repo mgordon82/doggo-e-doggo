@@ -11,33 +11,33 @@ const lightTheme = {
     type: 'light',
     background: {
       default: '#E8E7E6',
-      disabled: '#dedede',
+      disabled: '#dedede'
     },
 
     common: {
       black,
       white,
-      offWhite: '#f5f6f7',
+      offWhite: '#f5f6f7'
     },
 
     error: {
-      main: error,
+      main: error
     },
 
     layout: {
       header: {
-        background: '#e0e3e5',
-      },
+        background: '#e0e3e5'
+      }
     },
 
     success: {
-      main: success,
+      main: success
     },
     warning: {
-      main: warning,
+      main: warning
     },
     information: {
-      main: '#045eda',
+      main: '#045eda'
     },
 
     breakpoints: {
@@ -46,10 +46,10 @@ const lightTheme = {
         sm: 600,
         md: 900,
         lg: 1300,
-        xl: 1536,
-      },
-    },
-  },
+        xl: 1536
+      }
+    }
+  }
 };
 
 export default createTheme(lightTheme);

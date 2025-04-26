@@ -8,7 +8,7 @@ const PrivateLayoutRouter = ({ isAuthed, ...miscProps }) => {
     return (
       <Navigate
         to={{
-          pathname: '/login',
+          pathname: '/login'
         }}
       />
     );
@@ -23,7 +23,7 @@ const PrivateLayoutRouter = ({ isAuthed, ...miscProps }) => {
 
 PrivateLayoutRouter.propTypes = {
   children: PropTypes.object,
-  isAuthed: PropTypes.bool,
+  isAuthed: PropTypes.bool
 };
 
 export default PrivateLayoutRouter;

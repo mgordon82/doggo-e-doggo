@@ -8,7 +8,7 @@ import {
   MenuItem,
   Toolbar,
   Tooltip,
-  Typography,
+  Typography
 } from '@mui/material';
 import React from 'react';
 import { useDispatch } from 'react-redux';
@@ -47,7 +47,7 @@ const Header = () => {
               fontWeight: 700,
               letterSpacing: '.3rem',
               color: 'inherit',
-              textDecoration: 'none',
+              textDecoration: 'none'
             }}
           >
             DOGGO-E-DOGGO
@@ -65,12 +65,12 @@ const Header = () => {
               anchorEl={anchorElUser}
               anchorOrigin={{
                 vertical: 'top',
-                horizontal: 'right',
+                horizontal: 'right'
               }}
               keepMounted
               transformOrigin={{
                 vertical: 'top',
-                horizontal: 'right',
+                horizontal: 'right'
               }}
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}

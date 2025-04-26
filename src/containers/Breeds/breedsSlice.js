@@ -4,7 +4,7 @@ const initialState = {
   data: [],
   hasCompleted: false,
   isLoading: false,
-  error: null,
+  error: null
 };
 
 const breedsSlice = createSlice({
@@ -25,8 +25,8 @@ const breedsSlice = createSlice({
       state.data = [];
       state.hasCompleted = false;
       state.error = action.payload;
-    },
-  },
+    }
+  }
 });
 
 export const { getBreeds, getBreedsSuccess, getBreedsFailed } =

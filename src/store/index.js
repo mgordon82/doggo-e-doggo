@@ -11,10 +11,10 @@ const epicMiddleware = createEpicMiddleware();
 const store = configureStore({
   reducer: {
     auth: authenticationSlice,
-    breeds: breedsSlice,
+    breeds: breedsSlice
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(epicMiddleware),
+    getDefaultMiddleware().concat(epicMiddleware)
 });
 
 epicMiddleware.run(rootEpic);

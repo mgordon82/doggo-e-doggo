@@ -5,7 +5,7 @@ import {
   Paper,
   Stack,
   TextField,
-  Typography,
+  Typography
 } from '@mui/material';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,7 +14,7 @@ import { getBreeds } from '../../containers/Breeds/breedsSlice';
 const Dashboard = () => {
   const dispatch = useDispatch();
   const {
-    data: breedsData,
+    data: breedsData
     // hasCompleted: breedsLoaded,
     // isLoading: breedsLoading,
     // error: loadingError,
