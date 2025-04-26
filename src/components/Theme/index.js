@@ -7,7 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 
 import lightTheme from './lightTheme';
 
-const loadTheme = (theme) => {
+const loadTheme = () => {
   return lightTheme;
 };
 
