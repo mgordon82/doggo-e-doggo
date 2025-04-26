@@ -20,24 +20,34 @@ const Dashboard = () => {
     // error: loadingError,
   } = useSelector((state) => state.breeds);
 
-  // const [selectedBreeds, setSelectedBreeds] = React.useState([]);
-  // const [zipCodes, setZipCodes] = React.useState([]);
-  // const [minAge, setMinAge] = React.useState('');
-  // const [maxAge, setMaxAge] = React.useState('');
+  const [selectedBreeds, setSelectedBreeds] = React.useState([]);
+  const [zipCodes, setZipCodes] = React.useState([]);
+  const [minAge, setMinAge] = React.useState('');
+  const [maxAge, setMaxAge] = React.useState('');
 
-  // const handleBreedSelection = (event, newValue) => {
-  //   setSelectedBreeds(newValue);
-  // };
+  const handleBreedSelection = (event, newValue) => {
+    setSelectedBreeds(...selectedBreeds, newValue);
+  };
 
-  // const handleSearch = () => {
-  //   const params = {
-  //     selectedBreeds,
-  //     zipCodes,
-  //     minAge,
-  //     maxAge,
-  //   };
-  //   console.log('search criteria', params);
-  // };
+  const handleZipCodes = (event) => {
+    const value = event.target.value;
+    const validation = value.replace(/[^0-9,]/g, '');
+    const zipList = validation
+      .split(',')
+      .map((zip) => zip.trim())
+      .filter((zip) => /^\d{5}$/.test(zip));
+    setZipCodes(zipList);
+  };
+
+  const handleSearch = () => {
+    const params = {
+      selectedBreeds,
+      zipCodes,
+      minAge,
+      maxAge
+    };
+    console.log('search criteria', params);
+  };
   React.useEffect(() => {
     dispatch(getBreeds());
   }, []);
@@ -63,11 +73,11 @@ const Dashboard = () => {
           <Autocomplete
             fullWidth
             multiple
-            limitTags={0}
+            limitTags={4}
             id='dog-breeds'
             options={breedsData}
             getOptionLabel={(option) => option}
-            // onChange={handleBreedSelection}
+            onChange={handleBreedSelection}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -78,10 +88,25 @@ const Dashboard = () => {
             )}
           />
           <Stack direction='row' gap={3}>
-            <TextField label='Zip Codes' name='zipCode' fullWidth />
-            <TextField label='Minimum Age' name='ageMin' fullWidth />
-            <TextField label='Maximum Age' name='ageMax' fullWidth />
-            <Button fullWidth variant='contained'>
+            <TextField
+              label='Zip Codes'
+              name='zipCode'
+              fullWidth
+              onChange={handleZipCodes}
+            />
+            <TextField
+              label='Minimum Age'
+              name='ageMin'
+              fullWidth
+              onChange={(e) => setMinAge(e.target.value)}
+            />
+            <TextField
+              label='Maximum Age'
+              name='ageMax'
+              fullWidth
+              onChange={(e) => setMaxAge(e.target.value)}
+            />
+            <Button fullWidth variant='contained' onClick={handleSearch}>
               Search
             </Button>
           </Stack>
