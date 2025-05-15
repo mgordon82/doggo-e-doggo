@@ -2,6 +2,8 @@ import {
   Autocomplete,
   Box,
   Button,
+  List,
+  ListItem,
   Paper,
   Stack,
   TextField,
@@ -10,6 +12,7 @@ import {
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getBreeds } from '../../containers/Breeds/breedsSlice';
+import { getAvailableDogs, getDogsById } from '../../containers/Dogs/dogsSlice';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -20,13 +23,29 @@ const Dashboard = () => {
     // error: loadingError,
   } = useSelector((state) => state.breeds);
 
+  const { data: availableDogIds, hasCompleted: dogIdsLoaded } = useSelector(
+    (state) => state.dogs.availableDogIds
+  );
+
+  const { data: availableDogs } = useSelector((state) => state.dogs.dogsById);
+
   const [selectedBreeds, setSelectedBreeds] = React.useState([]);
   const [zipCodes, setZipCodes] = React.useState([]);
-  const [minAge, setMinAge] = React.useState('');
-  const [maxAge, setMaxAge] = React.useState('');
+  const [minAge, setMinAge] = React.useState();
+  const [maxAge, setMaxAge] = React.useState();
+
+  React.useEffect(() => {
+    dispatch(getBreeds());
+  }, []);
+
+  React.useEffect(() => {
+    if (dogIdsLoaded) {
+      dispatch(getDogsById(availableDogIds.resultIds));
+    }
+  }, [dogIdsLoaded]);
 
   const handleBreedSelection = (event, newValue) => {
-    setSelectedBreeds(...selectedBreeds, newValue);
+    setSelectedBreeds(newValue);
   };
 
   const handleZipCodes = (event) => {
@@ -43,14 +62,11 @@ const Dashboard = () => {
     const params = {
       selectedBreeds,
       zipCodes,
-      minAge,
-      maxAge
+      minAge: minAge ? Number(minAge) : undefined,
+      maxAge: maxAge ? Number(maxAge) : undefined
     };
-    console.log('search criteria', params);
+    dispatch(getAvailableDogs(params));
   };
-  React.useEffect(() => {
-    dispatch(getBreeds());
-  }, []);
 
   return (
     <>
@@ -75,6 +91,7 @@ const Dashboard = () => {
             multiple
             limitTags={4}
             id='dog-breeds'
+            filterSelectedOptions
             options={breedsData}
             getOptionLabel={(option) => option}
             onChange={handleBreedSelection}
@@ -98,7 +115,7 @@ const Dashboard = () => {
               label='Minimum Age'
               name='ageMin'
               fullWidth
-              onChange={(e) => setMinAge(e.target.value)}
+              onChange={(e) => setMinAge(e.target.value.number)}
             />
             <TextField
               label='Maximum Age'
@@ -113,6 +130,12 @@ const Dashboard = () => {
         </Stack>
       </Paper>
       <Box>Results</Box>
+      <List>
+        {availableDogs &&
+          availableDogs.map((dog, key) => {
+            return <ListItem key={key}>{dog.name}</ListItem>;
+          })}
+      </List>
     </>
   );
 };
