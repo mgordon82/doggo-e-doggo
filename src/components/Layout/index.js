@@ -17,7 +17,7 @@ const Layout = () => {
       }}
     >
       <Header />
-      <Box sx={{ display: 'flex' }}>
+      <Box sx={{ display: 'flex', overflowY: 'auto' }}>
         <Container maxWidth='xl' sx={{ py: 3 }}>
           <Outlet />
         </Container>
