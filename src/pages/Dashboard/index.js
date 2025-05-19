@@ -5,6 +5,7 @@ import {
   Card,
   CardContent,
   CardMedia,
+  Pagination,
   Paper,
   Stack,
   TextField,
@@ -44,6 +45,11 @@ const Dashboard = () => {
   const [minAge, setMinAge] = React.useState();
   const [maxAge, setMaxAge] = React.useState();
   const [sortOrder, setSortOrder] = React.useState('asc');
+  const [page, setPage] = React.useState(1);
+
+  const lastSearchParams = React.useRef({});
+
+  const pageSize = 25;
 
   React.useEffect(() => {
     dispatch(getBreeds());
@@ -89,13 +95,29 @@ const Dashboard = () => {
   const handleSearch = () => {
     dispatch(resetAvailableDogs());
     dispatch(resetDogsById());
+    setPage(1);
 
     const params = {
       breeds: selectedBreeds,
       zipCodes,
       ageMin: minAge ? Number(minAge) : undefined,
       ageMax: maxAge ? Number(maxAge) : undefined,
-      sort: `name:${sortOrder}`
+      sort: `name:${sortOrder}`,
+      size: pageSize,
+      from: 0
+    };
+
+    lastSearchParams.current = params;
+
+    dispatch(getAvailableDogs(params));
+  };
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+    const params = {
+      ...lastSearchParams.current,
+      size: pageSize,
+      from: (value - 1) * pageSize
     };
 
     dispatch(getAvailableDogs(params));
@@ -168,21 +190,34 @@ const Dashboard = () => {
         </Stack>
       </Paper>
       <Box>
-        <Stack direction='row' justifyContent='space-between'>
-          <Typography>There are {availableDogs.length || 0} Results</Typography>
+        <Stack direction='row' justifyContent='space-between' mb={2}>
+          <Typography>
+            There are {availableDogs.length || 0} results out of {''}
+            {availableDogIds.total}
+          </Typography>
+          <Pagination
+            count={Math.ceil(availableDogIds.total / pageSize)}
+            page={page}
+            onChange={handlePageChange}
+            color='primary'
+          />
           <Typography>
             Sort:{' '}
             <Button
               variant='text'
-              onClick={() => setSortOrder('asc')}
-              sx={{ fontWeight: sortOrder === 'desc' ? 'bold' : 'normal' }}
+              onClick={() => {
+                setSortOrder('asc');
+                handleSearch();
+              }}
             >
               A-Z
             </Button>
             <Button
               variant='text'
-              onClick={() => setSortOrder('desc')}
-              sx={{ fontWeight: sortOrder === 'desc' ? 'bold' : 'normal' }}
+              onClick={() => {
+                setSortOrder('desc');
+                handleSearch();
+              }}
             >
               Z-A
             </Button>
