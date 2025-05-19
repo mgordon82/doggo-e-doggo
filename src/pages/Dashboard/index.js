@@ -5,8 +5,6 @@ import {
   Card,
   CardContent,
   CardMedia,
-  List,
-  ListItem,
   Paper,
   Stack,
   TextField,
@@ -45,6 +43,7 @@ const Dashboard = () => {
   const [zipCodes, setZipCodes] = React.useState([]);
   const [minAge, setMinAge] = React.useState();
   const [maxAge, setMaxAge] = React.useState();
+  const [sortOrder, setSortOrder] = React.useState('asc');
 
   React.useEffect(() => {
     dispatch(getBreeds());
@@ -63,6 +62,19 @@ const Dashboard = () => {
   const handleBreedSelection = (event, newValue) => {
     setSelectedBreeds(newValue);
   };
+
+  const sortedDogs = React.useMemo(() => {
+    if (!availableDogs) return [];
+    return [...availableDogs].sort((a, b) => {
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+      if (sortOrder === 'asc') {
+        return nameA.localeCompare(nameB);
+      } else {
+        return nameB.localeCompare(nameA);
+      }
+    });
+  }, [availableDogs, sortOrder]);
 
   const handleZipCodes = (event) => {
     const value = event.target.value;
@@ -83,7 +95,7 @@ const Dashboard = () => {
       zipCodes,
       ageMin: minAge ? Number(minAge) : undefined,
       ageMax: maxAge ? Number(maxAge) : undefined,
-      sort: 'breed:asc'
+      sort: `name:${sortOrder}`
     };
 
     dispatch(getAvailableDogs(params));
@@ -158,7 +170,23 @@ const Dashboard = () => {
       <Box>
         <Stack direction='row' justifyContent='space-between'>
           <Typography>There are {availableDogs.length || 0} Results</Typography>
-          <Typography>Sort: Asc/Desc</Typography>
+          <Typography>
+            Sort:{' '}
+            <Button
+              variant='text'
+              onClick={() => setSortOrder('asc')}
+              sx={{ fontWeight: sortOrder === 'desc' ? 'bold' : 'normal' }}
+            >
+              A-Z
+            </Button>
+            <Button
+              variant='text'
+              onClick={() => setSortOrder('desc')}
+              sx={{ fontWeight: sortOrder === 'desc' ? 'bold' : 'normal' }}
+            >
+              Z-A
+            </Button>
+          </Typography>
         </Stack>
         <Stack
           gap={4}
@@ -167,32 +195,27 @@ const Dashboard = () => {
           justifyContent='space-between'
           direction='row'
         >
-          {[...(availableDogs || [])]
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((dog, key) => (
-              <Card
-                key={key}
-                sx={{ width: 300, borderRadius: 4, boxShadow: 3 }}
-              >
-                <CardMedia
-                  component='img'
-                  height='200'
-                  image={dog.img}
-                  alt={`${dog.name} the ${dog.breed}`}
-                  sx={{ objectFit: 'cover' }}
-                />
-                <CardContent>
-                  <Typography variant='h6' fontWeight='bold' gutterBottom>
-                    {dog.name}
-                  </Typography>
-                  <Stack direction='row' justifyContent='space-between' mb={2}>
-                    <Typography variant='body1'>{dog.age} Year Old</Typography>
-                    <Typography variant='body1'>{dog.breed}</Typography>
-                  </Stack>
-                  <Typography variant='body1'>From: {dog.zip_code}</Typography>
-                </CardContent>
-              </Card>
-            ))}
+          {sortedDogs.map((dog, key) => (
+            <Card key={key} sx={{ width: 300, borderRadius: 4, boxShadow: 3 }}>
+              <CardMedia
+                component='img'
+                height='200'
+                image={dog.img}
+                alt={`${dog.name} the ${dog.breed}`}
+                sx={{ objectFit: 'cover' }}
+              />
+              <CardContent>
+                <Typography variant='h6' fontWeight='bold' gutterBottom>
+                  {dog.name}
+                </Typography>
+                <Stack direction='row' justifyContent='space-between' mb={2}>
+                  <Typography variant='body1'>{dog.age} Year Old</Typography>
+                  <Typography variant='body1'>{dog.breed}</Typography>
+                </Stack>
+                <Typography variant='body1'>From: {dog.zip_code}</Typography>
+              </CardContent>
+            </Card>
+          ))}
         </Stack>
       </Box>
     </>
