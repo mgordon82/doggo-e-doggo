@@ -2,6 +2,9 @@ import {
   Autocomplete,
   Box,
   Button,
+  Card,
+  CardContent,
+  CardMedia,
   List,
   ListItem,
   Paper,
@@ -12,7 +15,12 @@ import {
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getBreeds } from '../../containers/Breeds/breedsSlice';
-import { getAvailableDogs, getDogsById } from '../../containers/Dogs/dogsSlice';
+import {
+  getAvailableDogs,
+  getDogsById,
+  resetAvailableDogs,
+  resetDogsById
+} from '../../containers/Dogs/dogsSlice';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -23,11 +31,15 @@ const Dashboard = () => {
     // error: loadingError,
   } = useSelector((state) => state.breeds);
 
-  const { data: availableDogIds, hasCompleted: dogIdsLoaded } = useSelector(
-    (state) => state.dogs.availableDogIds
-  );
+  const {
+    data: availableDogIds,
+    isLoading: areDogIdsLoading,
+    hasCompleted: dogIdsLoaded
+  } = useSelector((state) => state.dogs.availableDogIds);
 
-  const { data: availableDogs } = useSelector((state) => state.dogs.dogsById);
+  const { data: availableDogs, isLoading: areDogsLoading } = useSelector(
+    (state) => state.dogs.dogsById
+  );
 
   const [selectedBreeds, setSelectedBreeds] = React.useState([]);
   const [zipCodes, setZipCodes] = React.useState([]);
@@ -39,10 +51,14 @@ const Dashboard = () => {
   }, []);
 
   React.useEffect(() => {
-    if (dogIdsLoaded) {
+    if (
+      dogIdsLoaded &&
+      Array.isArray(availableDogIds?.resultIds) &&
+      availableDogIds.resultIds.length > 0
+    ) {
       dispatch(getDogsById(availableDogIds.resultIds));
     }
-  }, [dogIdsLoaded]);
+  }, [dogIdsLoaded, availableDogIds?.resultIds?.join(',')]);
 
   const handleBreedSelection = (event, newValue) => {
     setSelectedBreeds(newValue);
@@ -59,12 +75,17 @@ const Dashboard = () => {
   };
 
   const handleSearch = () => {
+    dispatch(resetAvailableDogs());
+    dispatch(resetDogsById());
+
     const params = {
-      selectedBreeds,
+      breeds: selectedBreeds,
       zipCodes,
-      minAge: minAge ? Number(minAge) : undefined,
-      maxAge: maxAge ? Number(maxAge) : undefined
+      ageMin: minAge ? Number(minAge) : undefined,
+      ageMax: maxAge ? Number(maxAge) : undefined,
+      sort: 'breed:asc'
     };
+
     dispatch(getAvailableDogs(params));
   };
 
@@ -115,7 +136,7 @@ const Dashboard = () => {
               label='Minimum Age'
               name='ageMin'
               fullWidth
-              onChange={(e) => setMinAge(e.target.value.number)}
+              onChange={(e) => setMinAge(e.target.value)}
             />
             <TextField
               label='Maximum Age'
@@ -123,19 +144,57 @@ const Dashboard = () => {
               fullWidth
               onChange={(e) => setMaxAge(e.target.value)}
             />
-            <Button fullWidth variant='contained' onClick={handleSearch}>
+            <Button
+              loading={areDogsLoading || areDogIdsLoading}
+              fullWidth
+              variant='contained'
+              onClick={handleSearch}
+            >
               Search
             </Button>
           </Stack>
         </Stack>
       </Paper>
-      <Box>Results</Box>
-      <List>
-        {availableDogs &&
-          availableDogs.map((dog, key) => {
-            return <ListItem key={key}>{dog.name}</ListItem>;
-          })}
-      </List>
+      <Box>
+        <Stack direction='row' justifyContent='space-between'>
+          <Typography>There are {availableDogs.length || 0} Results</Typography>
+          <Typography>Sort: Asc/Desc</Typography>
+        </Stack>
+        <Stack
+          gap={4}
+          flexWrap='wrap'
+          alignItems='top'
+          justifyContent='space-between'
+          direction='row'
+        >
+          {[...(availableDogs || [])]
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((dog, key) => (
+              <Card
+                key={key}
+                sx={{ width: 300, borderRadius: 4, boxShadow: 3 }}
+              >
+                <CardMedia
+                  component='img'
+                  height='200'
+                  image={dog.img}
+                  alt={`${dog.name} the ${dog.breed}`}
+                  sx={{ objectFit: 'cover' }}
+                />
+                <CardContent>
+                  <Typography variant='h6' fontWeight='bold' gutterBottom>
+                    {dog.name}
+                  </Typography>
+                  <Stack direction='row' justifyContent='space-between' mb={2}>
+                    <Typography variant='body1'>{dog.age} Year Old</Typography>
+                    <Typography variant='body1'>{dog.breed}</Typography>
+                  </Stack>
+                  <Typography variant='body1'>From: {dog.zip_code}</Typography>
+                </CardContent>
+              </Card>
+            ))}
+        </Stack>
+      </Box>
     </>
   );
 };

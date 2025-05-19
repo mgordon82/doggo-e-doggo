@@ -1,4 +1,5 @@
 import axios from '../../utilities/axios';
+import qs from 'qs';
 import { ofType } from 'redux-observable';
 import { of } from 'rxjs';
 import { catchError, switchMap, mergeMap } from 'rxjs/operators';
@@ -16,7 +17,11 @@ const getAvailableDogsEpic = (action$) =>
     mergeMap(async (action) => {
       const searchResponse = await axios.get(
         `${primaryRestGateway()}/dogs/search`,
-        action.payload
+        {
+          params: action.payload,
+          paramsSerializer: (params) =>
+            qs.stringify(params, { arrayFormat: 'brackets' })
+        }
       );
       return searchResponse;
     }),

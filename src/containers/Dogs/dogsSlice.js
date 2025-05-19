@@ -34,6 +34,9 @@ const dogsSlice = createSlice({
       state.availableDogIds.hasCompleted = false;
       state.availableDogIds.error = action.payload;
     },
+    resetAvailableDogs: (state) => {
+      state.availableDogIds = initialState.availableDogIds;
+    },
     getDogsById: (state) => {
       state.dogsById.isLoading = true;
       state.dogsById.error = null;
@@ -48,6 +51,9 @@ const dogsSlice = createSlice({
       state.dogsById.data = [];
       state.dogsById.hasCompleted = false;
       state.dogsById.error = action.payload;
+    },
+    resetDogsById: (state) => {
+      state.dogsById = initialState.dogsById;
     }
   }
 });
@@ -56,9 +62,11 @@ export const {
   getAvailableDogs,
   getAvailableDogsSuccess,
   getAvailableDogsFailed,
+  resetAvailableDogs,
   getDogsById,
   getDogsByIdSuccess,
-  getDogsByIdFailed
+  getDogsByIdFailed,
+  resetDogsById
 } = dogsSlice.actions;
 
 export default dogsSlice.reducer;
