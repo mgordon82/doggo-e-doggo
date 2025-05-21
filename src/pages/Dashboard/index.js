@@ -5,18 +5,22 @@ import {
   Card,
   CardContent,
   CardMedia,
+  IconButton,
   Pagination,
   Paper,
   Stack,
   TextField,
   Typography
 } from '@mui/material';
+import StarOutlineIcon from '@mui/icons-material/StarOutline';
+import StarIcon from '@mui/icons-material/Star';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getBreeds } from '../../containers/Breeds/breedsSlice';
 import {
   getAvailableDogs,
   getDogsById,
+  getMatchingDog,
   resetAvailableDogs,
   resetDogsById
 } from '../../containers/Dogs/dogsSlice';
@@ -40,12 +44,17 @@ const Dashboard = () => {
     (state) => state.dogs.dogsById
   );
 
+  const { data: matchingDogId, isLoading: matchingDog } = useSelector(
+    (state) => state.dogs.matchingDog
+  );
+
   const [selectedBreeds, setSelectedBreeds] = React.useState([]);
   const [zipCodes, setZipCodes] = React.useState([]);
   const [minAge, setMinAge] = React.useState();
   const [maxAge, setMaxAge] = React.useState();
   const [sortOrder, setSortOrder] = React.useState('asc');
   const [page, setPage] = React.useState(1);
+  const [favorites, setFavorites] = React.useState([]);
 
   const lastSearchParams = React.useRef({});
 
@@ -92,6 +101,16 @@ const Dashboard = () => {
     setZipCodes(zipList);
   };
 
+  const toggleFavorite = (dog) => {
+    setFavorites((prev) => {
+      return prev.includes(dog.id)
+        ? prev.filter((id) => id !== dog.id)
+        : [...prev, dog.id];
+    });
+  };
+
+  console.log('match', matchingDogId);
+
   const handleSearch = () => {
     dispatch(resetAvailableDogs());
     dispatch(resetDogsById());
@@ -121,6 +140,12 @@ const Dashboard = () => {
     };
 
     dispatch(getAvailableDogs(params));
+  };
+
+  const findAMatch = () => {
+    if (favorites.length >= 0) {
+      dispatch(getMatchingDog(favorites));
+    }
   };
 
   return (
@@ -190,7 +215,12 @@ const Dashboard = () => {
         </Stack>
       </Paper>
       <Box>
-        <Stack direction='row' justifyContent='space-between' mb={2}>
+        <Stack
+          direction='row'
+          justifyContent='space-between'
+          alignItems='center'
+          mb={2}
+        >
           <Typography>
             There are {availableDogs.length || 0} results out of {''}
             {availableDogIds.total}
@@ -222,6 +252,17 @@ const Dashboard = () => {
               Z-A
             </Button>
           </Typography>
+          <Stack direction='row' alignItems='center' gap={2}>
+            <Typography>Matching {favorites.length} dog(s)</Typography>
+            <Button
+              variant='contained'
+              size='small'
+              loading={matchingDog}
+              onClick={() => findAMatch()}
+            >
+              Find A Match
+            </Button>
+          </Stack>
         </Stack>
         <Stack
           gap={4}
@@ -247,7 +288,23 @@ const Dashboard = () => {
                   <Typography variant='body1'>{dog.age} Year Old</Typography>
                   <Typography variant='body1'>{dog.breed}</Typography>
                 </Stack>
-                <Typography variant='body1'>From: {dog.zip_code}</Typography>
+                <Stack
+                  direction='row'
+                  justifyContent='space-between'
+                  alignItems='center'
+                >
+                  <Typography variant='body1'>From: {dog.zip_code}</Typography>
+                  <IconButton
+                    onClick={() => toggleFavorite(dog)}
+                    aria-label='favorite'
+                  >
+                    {favorites.includes(dog.id) ? (
+                      <StarIcon color='error' />
+                    ) : (
+                      <StarOutlineIcon />
+                    )}
+                  </IconButton>
+                </Stack>
               </CardContent>
             </Card>
           ))}

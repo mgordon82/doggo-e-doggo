@@ -12,6 +12,12 @@ const initialState = {
     hasCompleted: false,
     isLoading: false,
     error: null
+  },
+  matchingDog: {
+    data: '',
+    hasCompleted: false,
+    isLoading: false,
+    error: null
   }
 };
 
@@ -54,7 +60,26 @@ const dogsSlice = createSlice({
     },
     resetDogsById: (state) => {
       state.dogsById = initialState.dogsById;
-    }
+    },
+    getMatchingDog: (state) => {
+      state.matchingDog.isLoading = true;
+      state.matchingDog.error = null;
+    },
+    getMatchingDogSuccess: (state, action) => {
+      state.matchingDog.isLoading = false;
+      state.matchingDog.hasCompleted = true;
+      state.matchingDog.data = action.payload;
+    },
+    getMatchingDogFailed: (state, action) => {
+      state.matchingDog.isLoading = false;
+      state.matchingDog.data = [];
+      state.matchingDog.hasCompleted = false;
+      state.matchingDog.error = action.payload;
+    },
+    resetMatchingDog: (state) => {
+      state.matchingDog = initialState.dogsById;
+    },
+    resetAll: () => initialState
   }
 });
 
@@ -66,7 +91,12 @@ export const {
   getDogsById,
   getDogsByIdSuccess,
   getDogsByIdFailed,
-  resetDogsById
+  resetDogsById,
+  getMatchingDog,
+  getMatchingDogSuccess,
+  getMatchingDogFailed,
+  resetMatchingDog,
+  resetAll
 } = dogsSlice.actions;
 
 export default dogsSlice.reducer;

@@ -8,7 +8,9 @@ import {
   getAvailableDogsFailed,
   getAvailableDogsSuccess,
   getDogsByIdFailed,
-  getDogsByIdSuccess
+  getDogsByIdSuccess,
+  getMatchingDogSuccess,
+  getMatchingDogFailed
 } from './dogsSlice';
 
 const getAvailableDogsEpic = (action$) =>
@@ -47,6 +49,22 @@ const getDogsByIdEpic = (action$) =>
     })
   );
 
-const epics = [getAvailableDogsEpic, getDogsByIdEpic];
+const getMatchingDog = (action$) =>
+  action$.pipe(
+    ofType('dogs/getMatchingDog'),
+    mergeMap(async (action) => {
+      const matchResponse = await axios.post(
+        `${primaryRestGateway()}/dogs/match`,
+        action.payload
+      );
+      return matchResponse;
+    }),
+    switchMap((res) => [getMatchingDogSuccess(res.data)]),
+    catchError((error) => {
+      return of(getMatchingDogFailed(error.message));
+    })
+  );
+
+const epics = [getAvailableDogsEpic, getDogsByIdEpic, getMatchingDog];
 
 export default epics;
