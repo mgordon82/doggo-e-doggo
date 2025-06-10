@@ -44,9 +44,11 @@ const Dashboard = () => {
     (state) => state.dogs.dogsById
   );
 
-  const { data: matchingDogId, isLoading: matchingDog } = useSelector(
-    (state) => state.dogs.matchingDog
-  );
+  const {
+    data: matchingDogId,
+    hasCompleted: dogMatched,
+    isLoading: matchingDog
+  } = useSelector((state) => state.dogs.matchingDog);
 
   const [selectedBreeds, setSelectedBreeds] = React.useState([]);
   const [zipCodes, setZipCodes] = React.useState([]);
@@ -73,6 +75,12 @@ const Dashboard = () => {
       dispatch(getDogsById(availableDogIds.resultIds));
     }
   }, [dogIdsLoaded, availableDogIds?.resultIds?.join(',')]);
+
+  React.useEffect(() => {
+    if (dogMatched) {
+      dispatch(getDogsById([matchingDog.match]));
+    }
+  });
 
   const handleBreedSelection = (event, newValue) => {
     setSelectedBreeds(newValue);
