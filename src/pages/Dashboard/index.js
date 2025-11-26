@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   Autocomplete,
   Box,
@@ -10,11 +11,11 @@ import {
   Paper,
   Stack,
   TextField,
-  Typography
+  Typography,
+  Grid
 } from '@mui/material';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
 import StarIcon from '@mui/icons-material/Star';
-import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getBreeds } from '../../containers/Breeds/breedsSlice';
 import {
@@ -27,6 +28,7 @@ import {
 
 const Dashboard = () => {
   const dispatch = useDispatch();
+
   const {
     data: breedsData
     // hasCompleted: breedsLoaded,
@@ -40,20 +42,20 @@ const Dashboard = () => {
     hasCompleted: dogIdsLoaded
   } = useSelector((state) => state.dogs.availableDogIds);
 
-  const { data: availableDogs, isLoading: areDogsLoading } = useSelector(
+  const { data: availableDogs = [], isLoading: areDogsLoading } = useSelector(
     (state) => state.dogs.dogsById
   );
 
   const {
     data: matchingDogId,
     hasCompleted: dogMatched,
-    isLoading: matchingDog
+    isLoading: isMatchingDogLoading
   } = useSelector((state) => state.dogs.matchingDog);
 
   const [selectedBreeds, setSelectedBreeds] = React.useState([]);
   const [zipCodes, setZipCodes] = React.useState([]);
-  const [minAge, setMinAge] = React.useState();
-  const [maxAge, setMaxAge] = React.useState();
+  const [minAge, setMinAge] = React.useState('');
+  const [maxAge, setMaxAge] = React.useState('');
   const [sortOrder, setSortOrder] = React.useState('asc');
   const [page, setPage] = React.useState(1);
   const [favorites, setFavorites] = React.useState([]);
@@ -64,7 +66,7 @@ const Dashboard = () => {
 
   React.useEffect(() => {
     dispatch(getBreeds());
-  }, []);
+  }, [dispatch]);
 
   React.useEffect(() => {
     if (
@@ -74,13 +76,13 @@ const Dashboard = () => {
     ) {
       dispatch(getDogsById(availableDogIds.resultIds));
     }
-  }, [dogIdsLoaded, availableDogIds?.resultIds?.join(',')]);
+  }, [dispatch, dogIdsLoaded, availableDogIds]);
 
   React.useEffect(() => {
-    if (dogMatched) {
-      dispatch(getDogsById([matchingDog.match]));
+    if (dogMatched && matchingDogId?.match) {
+      dispatch(getDogsById([matchingDogId.match]));
     }
-  });
+  }, [dispatch, dogMatched, matchingDogId]);
 
   const handleBreedSelection = (event, newValue) => {
     setSelectedBreeds(newValue);
@@ -89,13 +91,11 @@ const Dashboard = () => {
   const sortedDogs = React.useMemo(() => {
     if (!availableDogs) return [];
     return [...availableDogs].sort((a, b) => {
-      const nameA = a.name.toLowerCase();
-      const nameB = b.name.toLowerCase();
-      if (sortOrder === 'asc') {
-        return nameA.localeCompare(nameB);
-      } else {
-        return nameB.localeCompare(nameA);
-      }
+      const nameA = (a.name || '').toLowerCase();
+      const nameB = (b.name || '').toLowerCase();
+      return sortOrder === 'asc'
+        ? nameA.localeCompare(nameB)
+        : nameB.localeCompare(nameA);
     });
   }, [availableDogs, sortOrder]);
 
@@ -110,14 +110,12 @@ const Dashboard = () => {
   };
 
   const toggleFavorite = (dog) => {
-    setFavorites((prev) => {
-      return prev.includes(dog.id)
+    setFavorites((prev) =>
+      prev.includes(dog.id)
         ? prev.filter((id) => id !== dog.id)
-        : [...prev, dog.id];
-    });
+        : [...prev, dog.id]
+    );
   };
-
-  console.log('match', matchingDogId);
 
   const handleSearch = () => {
     dispatch(resetAvailableDogs());
@@ -135,7 +133,6 @@ const Dashboard = () => {
     };
 
     lastSearchParams.current = params;
-
     dispatch(getAvailableDogs(params));
   };
 
@@ -146,19 +143,22 @@ const Dashboard = () => {
       size: pageSize,
       from: (value - 1) * pageSize
     };
-
     dispatch(getAvailableDogs(params));
   };
 
   const findAMatch = () => {
-    if (favorites.length >= 0) {
+    if (favorites.length > 0) {
       dispatch(getMatchingDog(favorites));
     }
   };
 
+  const totalResults = availableDogs?.length ?? 0;
+  const totalAvailable = availableDogIds?.total ?? 0;
+  const pageCount = Math.max(1, Math.ceil(totalAvailable / pageSize));
+
   return (
     <>
-      <Typography component='h2' fontWeight='bold'>
+      <Typography component='h2' fontWeight='bold' mb={1}>
         Welcome to Doggo-E-Doggo!
       </Typography>
       <Typography component='p'>
@@ -169,7 +169,15 @@ const Dashboard = () => {
       <Typography my={4} component='p'>
         Search for a doggo below
       </Typography>
-      <Paper sx={{ py: 2, px: 5, mb: 3, backgroundColor: '#efefef' }}>
+
+      <Paper
+        sx={{
+          py: 2,
+          px: { xs: 2, sm: 3, md: 5 },
+          mb: 3,
+          backgroundColor: '#efefef'
+        }}
+      >
         <Typography variant='h6' component='h3'>
           Search Criteria
         </Typography>
@@ -177,10 +185,11 @@ const Dashboard = () => {
           <Autocomplete
             fullWidth
             multiple
+            size='small'
             limitTags={4}
             id='dog-breeds'
             filterSelectedOptions
-            options={breedsData}
+            options={breedsData || []}
             getOptionLabel={(option) => option}
             onChange={handleBreedSelection}
             renderInput={(params) => (
@@ -192,131 +201,167 @@ const Dashboard = () => {
               />
             )}
           />
-          <Stack direction='row' gap={3}>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            gap={2}
+            alignItems='flex-start'
+          >
             <TextField
               label='Zip Codes'
+              size='small'
               name='zipCode'
               fullWidth
               onChange={handleZipCodes}
+              helperText='Comma-separated, e.g. 12345, 67890'
             />
             <TextField
               label='Minimum Age'
               name='ageMin'
+              size='small'
               fullWidth
+              value={minAge}
               onChange={(e) => setMinAge(e.target.value)}
             />
             <TextField
               label='Maximum Age'
               name='ageMax'
+              size='small'
               fullWidth
+              value={maxAge}
               onChange={(e) => setMaxAge(e.target.value)}
             />
             <Button
-              loading={areDogsLoading || areDogIdsLoading}
               fullWidth
               variant='contained'
               onClick={handleSearch}
+              disabled={areDogsLoading || areDogIdsLoading}
             >
-              Search
+              {areDogsLoading || areDogIdsLoading ? 'Searching…' : 'Search'}
             </Button>
           </Stack>
         </Stack>
       </Paper>
-      <Box>
+
+      <Box mb={3}>
         <Stack
-          direction='row'
+          direction={{ xs: 'column', md: 'row' }}
+          spacing={2}
           justifyContent='space-between'
-          alignItems='center'
-          mb={2}
+          alignItems={{ xs: 'flex-start', md: 'center' }}
         >
           <Typography>
-            There are {availableDogs.length || 0} results out of {''}
-            {availableDogIds.total}
+            Showing {totalResults} results out of {totalAvailable}
           </Typography>
+
           <Pagination
-            count={Math.ceil(availableDogIds.total / pageSize)}
+            count={pageCount}
             page={page}
             onChange={handlePageChange}
             color='primary'
+            size='small'
           />
-          <Typography>
-            Sort:{' '}
+
+          <Stack
+            direction='row'
+            alignItems='center'
+            spacing={1}
+            flexWrap='wrap'
+          >
+            <Typography>Sort:</Typography>
             <Button
-              variant='text'
+              size='small'
+              variant={sortOrder === 'asc' ? 'contained' : 'text'}
               onClick={() => {
                 setSortOrder('asc');
                 handleSearch();
               }}
             >
-              A-Z
+              A–Z
             </Button>
             <Button
-              variant='text'
+              size='small'
+              variant={sortOrder === 'desc' ? 'contained' : 'text'}
               onClick={() => {
                 setSortOrder('desc');
                 handleSearch();
               }}
             >
-              Z-A
+              Z–A
             </Button>
-          </Typography>
-          <Stack direction='row' alignItems='center' gap={2}>
+          </Stack>
+
+          <Stack
+            direction='row'
+            alignItems='center'
+            spacing={2}
+            flexWrap='wrap'
+          >
             <Typography>Matching {favorites.length} dog(s)</Typography>
             <Button
               variant='contained'
               size='small'
-              loading={matchingDog}
-              onClick={() => findAMatch()}
+              onClick={findAMatch}
+              disabled={favorites.length === 0 || isMatchingDogLoading}
             >
-              Find A Match
+              {isMatchingDogLoading ? 'Finding…' : 'Find A Match'}
             </Button>
           </Stack>
         </Stack>
-        <Stack
-          gap={4}
-          flexWrap='wrap'
-          alignItems='top'
-          justifyContent='space-between'
-          direction='row'
-        >
-          {sortedDogs.map((dog, key) => (
-            <Card key={key} sx={{ width: 300, borderRadius: 4, boxShadow: 3 }}>
-              <CardMedia
-                component='img'
-                height='200'
-                image={dog.img}
-                alt={`${dog.name} the ${dog.breed}`}
-                sx={{ objectFit: 'cover' }}
-              />
-              <CardContent>
-                <Typography variant='h6' fontWeight='bold' gutterBottom>
-                  {dog.name}
-                </Typography>
-                <Stack direction='row' justifyContent='space-between' mb={2}>
-                  <Typography variant='body1'>{dog.age} Year Old</Typography>
-                  <Typography variant='body1'>{dog.breed}</Typography>
-                </Stack>
-                <Stack
-                  direction='row'
-                  justifyContent='space-between'
-                  alignItems='center'
-                >
-                  <Typography variant='body1'>From: {dog.zip_code}</Typography>
-                  <IconButton
-                    onClick={() => toggleFavorite(dog)}
-                    aria-label='favorite'
+      </Box>
+
+      <Box>
+        <Grid container spacing={3}>
+          {sortedDogs.map((dog) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={dog.id}>
+              <Card sx={{ borderRadius: 4, boxShadow: 3, height: '100%' }}>
+                <CardMedia
+                  component='img'
+                  height='200'
+                  image={dog.img}
+                  alt={`${dog.name} the ${dog.breed}`}
+                  sx={{ objectFit: 'cover' }}
+                />
+                <CardContent>
+                  <Typography variant='h6' fontWeight='bold' gutterBottom>
+                    {dog.name}
+                  </Typography>
+                  <Stack
+                    direction='row'
+                    justifyContent='space-between'
+                    mb={2}
+                    spacing={1}
                   >
-                    {favorites.includes(dog.id) ? (
-                      <StarIcon color='error' />
-                    ) : (
-                      <StarOutlineIcon />
-                    )}
-                  </IconButton>
-                </Stack>
-              </CardContent>
-            </Card>
+                    <Typography variant='body1'>
+                      {dog.age} year{dog.age !== 1 ? 's' : ''} old
+                    </Typography>
+                    <Typography variant='body1' sx={{ textAlign: 'right' }}>
+                      {dog.breed}
+                    </Typography>
+                  </Stack>
+                  <Stack
+                    direction='row'
+                    justifyContent='space-between'
+                    alignItems='center'
+                  >
+                    <Typography variant='body1'>
+                      From: {dog.zip_code}
+                    </Typography>
+                    <IconButton
+                      onClick={() => toggleFavorite(dog)}
+                      aria-label='favorite'
+                    >
+                      {favorites.includes(dog.id) ? (
+                        <StarIcon color='error' />
+                      ) : (
+                        <StarOutlineIcon />
+                      )}
+                    </IconButton>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Grid>
           ))}
-        </Stack>
+        </Grid>
       </Box>
     </>
   );
